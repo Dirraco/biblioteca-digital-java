@@ -7,19 +7,10 @@ import java.util.Scanner;
 
 /**
  * Classe principal responsável por iniciar o sistema da Biblioteca Digital.
- *
- * Aqui é apresentado o menu de interação com o usuário via terminal,
- * permitindo realizar operações como cadastro de livros, cadastro de usuários,
- * empréstimos, devoluções e persistência dos dados.
+ * Aqui ocorre toda a interação com o usuário via terminal.
  */
 public class Main {
 
-    /**
-     * Método principal que inicia a execução do sistema.
-     *
-     * Ele cria a biblioteca, carrega dados previamente salvos
-     * e apresenta um menu interativo para o usuário.
-     */
     public static void main(String[] args) {
 
         Biblioteca biblioteca = new Biblioteca();
@@ -30,7 +21,7 @@ public class Main {
 
         int opcao = 0;
 
-        while (opcao != 6) {
+        while (opcao != 9) {
 
             System.out.println("\n=== BIBLIOTECA DIGITAL ===");
             System.out.println("1 - Cadastrar livro");
@@ -38,7 +29,10 @@ public class Main {
             System.out.println("3 - Cadastrar usuário");
             System.out.println("4 - Emprestar livro");
             System.out.println("5 - Devolver livro");
-            System.out.println("6 - Salvar e sair");
+            System.out.println("6 - Listar livros disponíveis");
+            System.out.println("7 - Listar livros emprestados");
+            System.out.println("8 - Ver histórico de empréstimos");
+            System.out.println("9 - Salvar e sair");
 
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
@@ -61,14 +55,12 @@ public class Main {
                     Livro livro = new Livro(titulo, autor, ano);
                     biblioteca.cadastrarLivro(livro);
 
-                    System.out.println("Livro cadastrado!");
-
+                    System.out.println("Livro cadastrado com sucesso!");
                     break;
 
                 case 2:
 
                     biblioteca.listarLivros();
-
                     break;
 
                 case 3:
@@ -82,8 +74,7 @@ public class Main {
                     Usuario usuario = new Usuario(nome, email);
                     biblioteca.cadastrarUsuario(usuario);
 
-                    System.out.println("Usuário cadastrado!");
-
+                    System.out.println("Usuário cadastrado com sucesso!");
                     break;
 
                 case 4:
@@ -91,9 +82,12 @@ public class Main {
                     System.out.print("Título do livro: ");
                     String tituloEmprestimo = scanner.nextLine();
 
+                    System.out.print("Email do usuário: ");
+                    String emailUsuario = scanner.nextLine();
+
                     try {
 
-                        biblioteca.emprestarLivro(tituloEmprestimo);
+                        biblioteca.emprestarLivro(tituloEmprestimo, emailUsuario);
 
                     } catch (LivroIndisponivelException e) {
 
@@ -111,15 +105,27 @@ public class Main {
                     biblioteca.devolverLivro(tituloDevolucao);
 
                     System.out.println("Livro devolvido.");
-
                     break;
 
                 case 6:
 
+                    biblioteca.listarLivrosDisponiveis();
+                    break;
+
+                case 7:
+
+                    biblioteca.listarLivrosEmprestados();
+                    break;
+
+                case 8:
+
+                    biblioteca.listarHistorico();
+                    break;
+
+                case 9:
+
                     biblioteca.salvarDados();
-
                     System.out.println("Sistema encerrado.");
-
                     break;
 
                 default:
@@ -131,5 +137,7 @@ public class Main {
         }
 
         scanner.close();
+
     }
+
 }

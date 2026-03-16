@@ -13,6 +13,7 @@ public class Biblioteca {
 
     private List<Livro> livros = new ArrayList<>();
     private List<Usuario> usuarios = new ArrayList<>();
+    private List<Emprestimo> historico = new ArrayList<>();
 
     /**
      * Cadastra um novo livro na biblioteca.
@@ -44,23 +45,32 @@ public class Biblioteca {
      *
      * @throws LivroIndisponivelException caso o livro já esteja emprestado
      */
-    public void emprestarLivro(String titulo) throws LivroIndisponivelException {
+    public void emprestarLivro(String titulo, String usuarioEmail) throws LivroIndisponivelException {
 
         Livro livro = buscarLivro(titulo);
 
-        if (livro != null) {
+        Usuario usuario = usuarios.stream()
+                .filter(u -> u.getEmail().equalsIgnoreCase(usuarioEmail))
+                .findFirst()
+                .orElse(null);
+
+        if (livro != null && usuario != null) {
 
             if (livro.isEmprestado()) {
-                throw new LivroIndisponivelException("Livro ja emprestado.");
+                throw new LivroIndisponivelException("Livro já está emprestado.");
             }
 
             livro.setEmprestado(true);
-            System.out.println("Livro emprestado com sucesso");
+
+            // registra no histórico
+            Emprestimo emprestimo = new Emprestimo(livro, usuario);
+            historico.add(emprestimo);
+
+            System.out.println("Livro emprestado com sucesso.");
 
         } else {
-            System.out.println("Livro não encontrado");
+            System.out.println("Livro ou usuário não encontrado.");
         }
-
     }
 
     /**
@@ -103,6 +113,42 @@ public class Biblioteca {
         } catch (IOException e) {
             System.out.println("Erro ao salvar dados.");
         }
+
+    }
+
+    /**
+     * Lista somente livros disponíveis para empréstimo.
+     */
+    public void listarLivrosDisponiveis() {
+
+        livros.stream()
+                .filter(l -> !l.isEmprestado())
+                .forEach(System.out::println);
+
+    }
+
+    /**
+     * Lista somente livros que estão emprestados.
+     */
+    public void listarLivrosEmprestados() {
+
+        livros.stream()
+                .filter(Livro::isEmprestado)
+                .forEach(System.out::println);
+
+    }
+
+    /**
+     * Exibe todo o histórico de empréstimos realizados no sistema.
+     */
+    public void listarHistorico() {
+
+        if (historico.isEmpty()) {
+            System.out.println("Nenhum empréstimo registrado.");
+            return;
+        }
+
+        historico.forEach(System.out::println);
 
     }
 
